@@ -1,0 +1,45 @@
+package sykam;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+public class ExcelWriting {
+
+	public static void main(String[] args) throws IOException {
+		// TODO Auto-generated method stub
+
+		XSSFWorkbook workbook = new XSSFWorkbook();
+
+		List<String> tableNames = null;// xpath to get all the tables
+
+		for (String string : tableNames) {
+			XSSFSheet sheet = workbook.createSheet(string);
+			int rowCount = 0;
+			int columnCount = 0;
+			int totalRowCount = 0; // xpath to getAlltheRows from respective table & its number
+			for (int i = 0; i < totalRowCount; i++) {
+				Row row = sheet.createRow(++rowCount);
+				int totalColumnCount = 0; // xpath to getAlltheRows from respective table & its number
+				while (columnCount<totalColumnCount) {
+					Cell cell = row.createCell(++columnCount);
+					cell.setCellValue("Write Xpath to get the respective Cell data");
+				}
+				columnCount = 0;
+				}
+			
+			rowCount = 0;
+		}
+
+		try (FileOutputStream outputStream = new FileOutputStream("TableData.xlsx")) {
+			workbook.write(outputStream);
+		}
+	}
+
+}
