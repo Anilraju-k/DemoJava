@@ -1,0 +1,112 @@
+package sykam;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.text.DecimalFormat;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+public class ExcelValidation {
+
+	static String excelFilePath = "C:\\Users\\1543357\\Desktop\\Splunk Validation.xlsx";
+	static CellStyle style = null;
+	static XSSFFont font = null;
+
+	public static void main(String[] args) throws Exception {
+		excecuteExcelTestCases();
+	}
+	
+	
+	
+
+	public static void excecuteExcelTestCases() {
+		DecimalFormat df = new DecimalFormat("0.00");
+		try {
+			FileInputStream file = new FileInputStream(new File(excelFilePath));
+			@SuppressWarnings("resource")
+			XSSFWorkbook workbook = new XSSFWorkbook(file);
+
+			int totaLNoOfSheets = workbook.getNumberOfSheets();
+			System.out.println("No of Sheets Available in the Excel are " + totaLNoOfSheets);
+
+			for (int j = 0; j < totaLNoOfSheets; j++) {
+
+				XSSFSheet sheet = workbook.getSheetAt(j);
+				System.out.println("Currently working on Sheet "+j);
+				int rowSize = sheet.getLastRowNum();
+				System.out.println("No of rows - " + rowSize);
+
+				// to get count column
+				int x = 0;
+				int countColumnNo = 0;
+				while (x < sheet.getRow(0).getLastCellNum()) {
+
+					if (sheet.getRow(0).getCell(x).getStringCellValue().contains("count")) {
+						countColumnNo = x;
+						break;
+					}
+					x = x + 1;
+				}
+
+				int y = 0;
+				int totalColumnNo = 0;
+				while (y < sheet.getRow(0).getLastCellNum()) {
+
+					if (sheet.getRow(0).getCell(y).getStringCellValue().contains("Total")) {
+						totalColumnNo = y;
+						break;
+					}
+					y = y + 1;
+				}
+				System.out.println("count Column No -" +countColumnNo);
+				System.out.println("total Column No -" +totalColumnNo);
+				
+				//double totalCount = sheet.getRow(1).getCell(totalColumnNo).getNumericCellValue();
+				double totalCount = Double.valueOf(sheet.getRow(1).getCell(totalColumnNo).getStringCellValue());
+				
+		
+				sheet.getRow(0).createCell(4).setCellValue("Percent");
+				sheet.getRow(0).createCell(5).setCellValue("Status");
+				for (int i = 1; i <= rowSize; i++) {
+
+					double count = Double.valueOf(sheet.getRow(i).getCell(countColumnNo).getStringCellValue());
+					
+					//System.out.print(count + " ");
+					//System.out.println((count > 0) ? "pass" : "fail");
+					String Percentage = df
+							.format((totalCount / Double.valueOf(sheet.getRow(i).getCell(countColumnNo).getStringCellValue()) * 100));
+					//System.out.println("Percentage Value - " + Percentage);
+					sheet.getRow(i).createCell(4).setCellValue(Percentage);
+					String status = (count > 0) ? "pass" : "fail";
+					if (status.equalsIgnoreCase("fail")) {
+						style = workbook.createCellStyle();
+						style.setFillForegroundColor(HSSFColor.YELLOW.index);
+						style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+						font = workbook.createFont();
+						// font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+						// font.setColor(HSSFColor.WHITE.index);
+						style.setFont(font);
+						sheet.getRow(i).createCell(5).setCellValue(status);
+						sheet.getRow(i).getCell(5).setCellStyle(style);
+					} else {
+						sheet.getRow(i).createCell(5).setCellValue(status);
+					}
+
+				}
+			}
+
+			file.close();
+			FileOutputStream out = new FileOutputStream(excelFilePath);
+			workbook.write(out);
+			out.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+}
