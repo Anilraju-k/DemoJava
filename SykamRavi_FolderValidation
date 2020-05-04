@@ -1,0 +1,111 @@
+package sykamm;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.text.DecimalFormat;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+public class TestClass {
+	
+	static String excelFilePath = "C:\\Users\\1543357\\Documents\\sykam\\Inputfile1.xlsx";
+	static String folderPath="C:\\Users\\1543357\\Documents\\sykam";
+	 static CellStyle style = null;
+	 static XSSFFont font = null;
+	
+	
+	public static void main(String[] args) throws Exception {
+		 /*File folder = new File(folderPath);
+	        String[] fileList = folder.list();
+	        for(String name:fileList){
+	          
+	        	   File innerFolder = new File(folderPath);
+	        	   String[] innerFileList = innerFolder.list();
+	        	   for(String inner:innerFileList){
+	        		   System.out.println(inner);
+	        	   }}*/
+		excecuteExcelTestCases();
+		
+	}
+
+	public static void excecuteExcelTestCases() {
+		//DecimalFormat df = new DecimalFormat("0.00");
+		try {
+			FileInputStream file = new FileInputStream(new File(excelFilePath));
+			@SuppressWarnings("resource")
+			XSSFWorkbook workbook = new XSSFWorkbook(file);
+			XSSFSheet sheet = workbook.getSheetAt(0);
+			//int rowSize = sheet.getLastRowNum();
+			int rowSize=sheet.getPhysicalNumberOfRows();
+			System.out.println("no of rows : "+(rowSize));
+			System.out.println("No of Test cases present in Excel are : "+(rowSize-1));
+			
+			for (int i = 1; i <rowSize; i++) {
+				String testCaseName=sheet.getRow(i).getCell(0).getStringCellValue();
+				String FolderNameName=sheet.getRow(i).getCell(1).getStringCellValue();
+				
+				if (!testCaseName.equalsIgnoreCase(null)) {
+			
+				System.out.println("Record from Excel - "+testCaseName);
+		        File folder = new File(folderPath);
+		        String[] fileList = folder.list();
+		        for(String name:fileList){
+		        	System.out.println("Record from folder -"+name);
+		           if (name.equalsIgnoreCase(testCaseName)){
+		        	   File innerFolder = new File(folderPath+"\\"+name+"\\"+FolderNameName);
+		        	   String[] innerFileList = innerFolder.list();
+		        	   
+		        	   String status="Fail";
+		        	   String fileName="NA";
+		        	   
+		        	   if(status=="Fail") {
+		        	   for(String inner:innerFileList){
+		        		   System.out.println("File present in folder "+inner);
+		        		   if(inner.contains("_TRANSLATEDGOOD837_")) {
+		        			   status ="pass";
+		        			   fileName=inner;
+		        			   System.out.println("::  _TRANSLATEDGOOD837_  :: file name - "+fileName+" Status -"+status);
+		        			   break;
+		        		   }
+		        	   }
+		        	   if(status=="Fail") {
+		        		for(String inner:innerFileList){
+		        		   if (inner.contains("_TRANSLATEDGOOD837")) {
+		        			   status ="pass";
+		        			   fileName=inner;
+		        			  
+		        			   System.out.println(":: _TRANSLATEDGOOD837  :: file name - "+fileName+" Status -"+status);
+		        			   break;
+						} 
+		        		}
+		        		  
+		        		}
+		        	 
+		        	   }
+		        	   
+		        	   sheet.getRow(i).createCell(5).setCellValue(status);
+        			   sheet.getRow(i).createCell(4).setCellValue(fileName);
+
+		           }
+		           else{
+		        	   
+		        	   System.out.println("Matching Folder does not found for Test case name present in excel. Test case name reffered from excel - "+testCaseName);
+		           }
+		        }
+		        
+		
+			}
+			}
+			file.close();
+			FileOutputStream out = new FileOutputStream(excelFilePath);
+			workbook.write(out);
+			out.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+}
