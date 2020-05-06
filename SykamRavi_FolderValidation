@@ -11,7 +11,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class TestClass {
 	
-	static String excelFilePath = "C:\\Users\\1543357\\Documents\\sykam\\Inputfile1.xlsx";
+	static String excelFilePath = "C:\\Users\\1543357\\Documents\\sykam\\Inputfile2.xlsx";
 	static String folderPath="C:\\Users\\1543357\\Documents\\sykam";
 	 static CellStyle style = null;
 	 static XSSFFont font = null;
@@ -27,7 +27,8 @@ public class TestClass {
 	        	   for(String inner:innerFileList){
 	        		   System.out.println(inner);
 	        	   }}*/
-		excecuteExcelTestCases();
+	
+	excecuteExcelTestCases();
 		
 	}
 
@@ -42,10 +43,10 @@ public class TestClass {
 			int rowSize=sheet.getPhysicalNumberOfRows();
 			System.out.println("no of rows : "+(rowSize));
 			System.out.println("No of Test cases present in Excel are : "+(rowSize-1));
-			
+			sheet.getRow(0).createCell(1).setCellValue("Sykam");
 			for (int i = 1; i <rowSize; i++) {
 				String testCaseName=sheet.getRow(i).getCell(0).getStringCellValue();
-				String FolderNameName=sheet.getRow(i).getCell(1).getStringCellValue();
+				String FolderNameName=sheet.getRow(i).getCell(4).getStringCellValue().substring(8, 20);
 				
 				if (!testCaseName.equalsIgnoreCase(null)) {
 			
@@ -85,9 +86,11 @@ public class TestClass {
 		        		}
 		        	 
 		        	   }
+		        	   sheet.getRow(i).createCell(5).setCellValue(fileName);
+		        	   sheet.getRow(i).createCell(6).setCellValue(status);
+		        	   sheet.getRow(i).createCell(1).setCellValue(FolderNameName);
 		        	   
-		        	   sheet.getRow(i).createCell(5).setCellValue(status);
-        			   sheet.getRow(i).createCell(4).setCellValue(fileName);
+        			   
 
 		           }
 		           else{
